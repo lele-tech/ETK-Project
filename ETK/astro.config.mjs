@@ -8,14 +8,16 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     server: {
-      proxy: {
-        '/owncast': {
-          target: 'http://192.168.100.47:8080',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/owncast/, ''),
-        },
-      },
-    },
+  proxy: {
+    '/owncast': {
+      target: 'http://209.148.103.84:8080',
+      changeOrigin: true,
+      rewrite: (path) => path.replace(/^\/owncast/, ''),
+    },
+  },
+},
+
   }
 });
+
 

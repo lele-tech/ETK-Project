@@ -22,7 +22,7 @@
     <div id="player" class="relative aspect-video rounded-xl bg-black">
       <video id="video" playsinline muted class="rounded-xl"></video>
       <div id="dvd-wrapper" class="absolute top-0 left-0 w-full h-full pointer-events-none hidden">
-        <div id="dvd" class="absolute left-0 top-0 w-[9vw] h-[5vw] bg-orange-500" style="mask: url('public/img/ETK_Logo.svg'); -webkit-mask: url('public/img/ETK_Logo.svg'); mask-size:108% 108%; -webkit-mask-size:108% 108%;"></div>
+        <div id="dvd" class="absolute left-0 top-0 w-[9vw] h-[5vw] bg-orange-500" style="mask: url('/img/ETK_Logo.svg'); -webkit-mask: url('/img/ETK_Logo.svg'); mask-size:108% 108%; -webkit-mask-size:108% 108%;"></div>
       </div>
     </div>
 
@@ -33,10 +33,12 @@
       const wrapper = document.getElementById("dvd-wrapper");
       const dvd = document.getElementById("dvd");
 
+
       const owncastStream = "/owncast/hls/stream.m3u8";
       const offlineVideo = "";
       const errorVideo = "/videos/Tech__Diff_1080.webm";
       const owncastStatusUrl = "/owncast/api/status";
+
 
       let hls = null;
       let lastState = null;
