@@ -1,1 +1,1 @@
-- [x] Modify StreamAndVideo.astro to center video player at 60% width with maintained aspect ratio
+- [ ] Add hover scale effect to .card-wrapper in src/pages/index.astro
