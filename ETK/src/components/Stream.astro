@@ -1,0 +1,101 @@
+import<main
+  class="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8"
+>
+  <video
+    id="player"
+    class="w-full max-w-full sm:max-w-2xl lg:max-w-4xl h-auto rounded-lg shadow-lg bg-black"
+    controls
+    autoplay
+    playsinline
+    muted></video>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest" client:load></script>
+
+<script client:load>
+  const serverUrl = "http://209.148.103.84:8080";
+
+  const video = document.getElementById("player");
+  const streamUrl = `${serverUrl}/hls/stream.m3u8`;
+
+  if (window.Hls) {
+    try {
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(streamUrl);
+        hls.attachMedia(video);
+      } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+        video.src = streamUrl;
+      }
+    } catch (err) {
+      // Suppress HLS errors
+    }
+  }
+
+  async function loadData() {
+    try {
+      if (statusRes && configRes) {
+        const status = await statusRes.json();
+        const config = await configRes.json();
+
+        const channelNameEl = document.getElementById("channelName");
+        const channelSummaryEl = document.getElementById("channelSummary");
+        const streamStatusEl = document.getElementById("streamStatus");
+
+        if (channelNameEl) channelNameEl.innerText = "🎥 " + config.name;
+        if (channelSummaryEl) channelSummaryEl.innerText = config.summary;
+        if (streamStatusEl)
+          streamStatusEl.innerText = status.online
+            ? `✅ En vivo con ${status.viewerCount} espectadores`
+            : "❌ Offline";
+      } else {
+        const streamStatusEl = document.getElementById("streamStatus");
+        if (streamStatusEl)
+          streamStatusEl.innerText = "⚠ No se pudo conectar al servidor";
+      }
+    } catch (err) {
+      // Suppress error logging
+      const streamStatusEl = document.getElementById("streamStatus");
+      if (streamStatusEl)
+        streamStatusEl.innerText = "⚠ No se pudo conectar al servidor";
+    }
+  }
+
+  loadData();
+  setInterval(loadData, 10000);
+</script>
+
+<style>
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+  }
+
+  video {
+    width: 80%;
+    max-width: 900px;
+    height: auto;
+    border-radius: 8px;
+    background: black;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+  }
+
+  footer {
+    background: #18181b;
+    padding: 1rem 2rem;
+    text-align: center;
+    border-top: 1px solid #2c2c2f;
+  }
+
+  @media (max-width: 600px) {
+    video {
+      width: 95%;
+    }
+    nav,
+    footer {
+      padding: 1rem;
+    }
+  }
+</style>

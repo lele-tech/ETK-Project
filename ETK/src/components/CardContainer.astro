@@ -1,0 +1,126 @@
+---
+import ExampleCard from "./ExampleCard.astro";
+
+interface Card {
+  title: string;
+  content: string;
+  thumbnail: string;
+  link: string;
+}
+interface Props {
+  cards: Card[];
+  title: string;
+}
+
+const { cards, title } = Astro.props as Props;
+const cardsLength = cards.length;
+const uniqueId = crypto.randomUUID();
+const isExpandable = cardsLength > 8;
+---
+
+<div class="card-container mb-8 sm:mb-16 lg:mb-32">
+  <h2
+    class="title text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold text-left mb-4 sm:mb-8"
+  >
+    {title}
+  </h2>
+
+  <div
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-8 items-stretch"
+    id={`cardGrid-${uniqueId}`}
+  >
+    {
+      cards.map((card, index) => (
+        <div class="card-wrapper flex" data-index={index}>
+          <ExampleCard
+            title={card.title}
+            content={card.content}
+            thumbnail={card.thumbnail}
+            link={card.link}
+          />
+        </div>
+      ))
+    }
+  </div>
+
+  <button
+    id={`toggleButton-${uniqueId}`}
+    class="toggle-button flex mx-auto mt-4 sm:mt-6 items-center justify-center hover:opacity-80"
+    aria-expanded="false"
+    aria-controls={`cardGrid-${uniqueId}`}
+    title="Mostrar más"
+  >
+    <svg
+      class="arrow-icon h-8 sm:h-12 lg:h-16 w-8 sm:w-12 lg:w-16"
+      fill="#ffffff"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 512 512"
+    >
+      <path
+        d="M256,0C114.837,0,0,114.837,0,256s114.837,256,256,256s256-114.837,256-256S397.163,0,256,0z 
+         M377.749,228.416 L271.083,335.083c-4.16,4.16-9.621,6.251-15.083,6.251c-5.462,0-10.923-2.091-15.083-6.251
+         L134.251,228.416c-8.341-8.341-8.341-21.824,0-30.165s21.824-8.341,30.165,0L256,289.835l91.584-91.584
+         c8.341-8.341,21.824-8.341,30.165,0C386.091,206.592,386.091,220.075,377.749,228.416z"
+      ></path>
+    </svg>
+  </button>
+</div>
+
+<script is:inline define:vars={{ uniqueId, cardsLength }}>
+  (function () {
+    const toggleButton = document.getElementById(`toggleButton-${uniqueId}`);
+    const cardGrid = document.getElementById(`cardGrid-${uniqueId}`);
+    if (!toggleButton || !cardGrid) return;
+
+    const wrappers = Array.from(cardGrid.querySelectorAll(".card-wrapper"));
+
+    // Determine number of columns based on screen size
+    let columns = 1;
+    if (window.matchMedia("(min-width: 1280px)").matches) {
+      columns = 4;
+    } else if (window.matchMedia("(min-width: 1024px)").matches) {
+      columns = 3;
+    } else if (window.matchMedia("(min-width: 768px)").matches) {
+      columns = 2;
+    }
+
+    const initialVisible = Math.min(cardsLength, columns * 2);
+
+    // Hide cards beyond initialVisible
+    wrappers.forEach((w, i) => {
+      if (i >= initialVisible) w.style.display = "none";
+    });
+
+    // Hide button if no need to expand
+    if (cardsLength <= initialVisible) {
+      toggleButton.style.display = "none";
+      return;
+    }
+
+    let expanded = false;
+
+    toggleButton.addEventListener("click", () => {
+      expanded = !expanded;
+      toggleButton.setAttribute("aria-expanded", String(expanded));
+
+      wrappers.forEach((w, i) => {
+        if (i >= initialVisible) w.style.display = expanded ? "flex" : "none";
+      });
+
+      toggleButton.classList.toggle("expanded", expanded);
+      toggleButton.title = expanded ? "Mostrar menos" : "Mostrar más";
+    });
+  })();
+</script>
+
+<style>
+  .arrow-icon {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    transform-origin: 50% 50%;
+  }
+
+  .toggle-button.expanded .arrow-icon {
+    transform: rotate(180deg);
+  }
+</style>

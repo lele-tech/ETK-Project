@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+/* Font Face Declarations */
+@font-face {
+  font-family: 'Audiowide';
+  src: url('/src/Fonts/Audiowide-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Exo';
+  src: url('/src/Fonts/static/Exo-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* CSS Variables for Fonts */
+:root {
+  --font-audiowide: 'Audiowide', sans-serif;
+  --font-exo: 'Exo', sans-serif;
+}
+
+/* Theme Variables */
+:root {
+  --bg-color: #f9f9f9;
+  --text-color: #111827;
+  --card-bg: #ffffff;
+}
+
+/* Prevent horizontal scroll */
+html, body {
+  overflow-x: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #0A0908;
+    --text-color: #f9fafb;
+    --card-bg: #374151;
+  }
+}

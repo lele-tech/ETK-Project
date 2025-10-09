@@ -1,0 +1,97 @@
+---
+---
+
+<style>
+  .dvd {
+    position: absolute;
+    width: 100px;
+    height: 50px;
+    mask: url("https://upload.wikimedia.org/wikipedia/commons/9/9b/DVD_logo.svg");
+    -webkit-mask: url("https://upload.wikimedia.org/wikipedia/commons/9/9b/DVD_logo.svg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    pointer-events: none;
+    display: none; /* se muestra solo cuando está activo */
+  }
+</style>
+
+<script>
+class DvdBouncer {
+  constructor(container, options = {}) {
+    this.container = container;
+    this.speed = options.speed || 2;
+    this.colors = options.colors || ["#ff8800", "#e124ff", "#6a19ff", "#ff2188"];
+    this.dvd = document.createElement("div");
+    this.dvd.classList.add("dvd");
+    this.container.appendChild(this.dvd);
+
+    this.x = 0;
+    this.y = 0;
+    this.dirX = 1;
+    this.dirY = 1;
+    this.prevColorIndex = 0;
+
+    this.dvd.style.backgroundColor = this.colors[0];
+
+    window.addEventListener("resize", () => this.onResize());
+  }
+
+  getNewColor() {
+    const palette = [...this.colors];
+    palette.splice(this.prevColorIndex, 1);
+    const idx = Math.floor(Math.random() * palette.length);
+    this.prevColorIndex = idx < this.prevColorIndex ? idx : idx + 1;
+    return palette[idx];
+  }
+
+  onResize() {
+    // Evita que el DVD quede fuera del contenedor si cambia tamaño
+    const { width: cw, height: ch } = this.container.getBoundingClientRect();
+    const dvdW = this.dvd.offsetWidth;
+    const dvdH = this.dvd.offsetHeight;
+
+    if (this.x + dvdW > cw) this.x = cw - dvdW;
+    if (this.y + dvdH > ch) this.y = ch - dvdH;
+  }
+
+  start() {
+    this.dvd.style.display = "block";
+    requestAnimationFrame(() => this.animate());
+  }
+
+  animate() {
+    const { width: cw, height: ch } = this.container.getBoundingClientRect();
+    const dvdW = this.dvd.offsetWidth;
+    const dvdH = this.dvd.offsetHeight;
+
+    if (this.x + dvdW >= cw || this.x <= 0) {
+      this.dirX *= -1;
+      this.dvd.style.backgroundColor = this.getNewColor();
+    }
+    if (this.y + dvdH >= ch || this.y <= 0) {
+      this.dirY *= -1;
+      this.dvd.style.backgroundColor = this.getNewColor();
+    }
+
+    this.x += this.dirX * this.speed;
+    this.y += this.dirY * this.speed;
+
+    this.dvd.style.left = this.x + "px";
+    this.dvd.style.top = this.y + "px";
+
+    requestAnimationFrame(() => this.animate());
+  }
+
+  stop() {
+    this.dvd.style.display = "none";
+  }
+}
+
+// --- Uso ---
+/*
+const container = document.getElementById("player");
+const dvd = new DvdBouncer(container);
+dvd.start();
+*/
+</script>

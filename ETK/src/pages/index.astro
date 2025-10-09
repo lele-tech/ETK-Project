@@ -1,0 +1,301 @@
+---
+import Layout from "../layouts/Layout.astro";
+import CardContainer from "../components/CardContainer.astro";
+import Nav from "../components/Nav.astro";
+//import Stream from "../components/Stream.astro";
+import Stream from "../components/StreamAndVideo.astro";
+import ETKMusicLogo from "../images/ETK_Logo.svg";
+import Ground from "../images/Assets_1080_Ground.png";
+import Mountains from "../images/Assets_1080_Mountains.png";
+import City from "../images/Assets_1080_City v2.png";
+import Sun from "../images/Assets_1080_Sun.png";
+---
+
+<Layout title="ETK Music">
+  <main class="relative w-screen h-screen">
+    <Nav />
+    <div class="flex absolute inset-0 z-5 justify-center items-center p-24">
+      <Stream />
+    </div>
+
+    <section class="relative w-screen h-screen">
+      <img
+        class="absolute inset-0 w-full h-full object-cover mask-b-from-45% mask-b-to-100%"
+        id="Sun"
+        src={Sun.src}
+        alt="Sun vaporwave style"
+      />
+      <img
+        class="absolute inset-0 w-full h-full object-cover mask-b-from-45% mask-b-to-100%"
+        id="Ground"
+        src={Ground.src}
+        alt="Ground vaporwave style"
+      />
+      <img
+        class="absolute inset-0 w-full h-full object-cover
+      mask-b-from-65% mask-b-to-100%"
+        id="City"
+        src={City.src}
+        alt="City vaporwave style"
+      />
+      <img
+        class="absolute inset-0 w-full h-full object-cover mask-b-from-70% mask-b-to-100%"
+        id="Mountains"
+        src={Mountains.src}
+        alt="Mountains vaporwave style"
+      />
+
+      <div
+        class="relative z-10 flex justify-center items-center w-screen h-screen scale-50"
+      >
+        <img
+          id="etk-logo"
+          src={ETKMusicLogo.src}
+          alt="ETK Logo"
+          class="cursor-pointer"
+        />
+      </div>
+    </section>
+
+    {/* Content after hero */}
+    <section class="w-full max-w-6xl mx-auto px-4 py-16 space-y-8">
+      <CardContainer cards={[]} title="Latest Streams" />
+      <CardContainer cards={[]} title="Incoming" />
+    </section>
+  </main>
+</Layout>
+
+<style is:global>
+  @import "../styles/global.css";
+  h1 {
+    font-family: var(--font-audiowide);
+  }
+
+  .arrow-icon {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    transform-origin: 50% 50%;
+  }
+
+  .toggle-button.expanded .arrow-icon {
+    transform: rotate(180deg);
+  }
+</style>
+
+<script>
+  // Prevent browser from restoring scroll position and force scroll to top
+  history.scrollRestoration = "manual";
+  window.scrollTo(0, 0);
+
+  const channelId = "UC0Y61RStMFQwpNFU9u_NpyQ";
+  const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+
+  async function cargarVideos() {
+    try {
+      const res = await fetch(
+        `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`
+      );
+      const data = await res.json();
+
+      const latestGrid = document
+        .querySelectorAll(".card-container")[0]
+        ?.querySelector(".grid");
+      if (!latestGrid) {
+        console.error("Latest Streams grid not found");
+        return;
+      }
+
+      // Clear any existing (though initially empty)
+      latestGrid.innerHTML = "";
+
+      for (const video of data.items) {
+        const videoId = video.link.split("v=")[1]?.split("&")[0];
+        if (!videoId) continue;
+
+        const thumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+        const content = video.description
+          ? video.description.slice(0, 100) + "..."
+          : "No description available.";
+
+        const cardWrapperHTML = `
+  <div class="card-wrapper" style="display: flex;">
+    <a href="${video.link}" target="_blank" class="block">
+      <div>
+        <div class="aspect-video overflow-hidden rounded mb-2 sm:mb-4">
+          <img src="${thumbnail}" alt="Thumbnail for ${video.title}" class="w-full h-full object-cover">
+        </div>
+<h2 class="text-xl sm:text-3xl lg:text-3xl text-left font-semibold line-clamp-2 break-all ">
+  ${video.title}
+</h2>
+<p class="text-sm sm:text-base text-left line-clamp-1 break-all">
+  ${content}
+</p>
+
+
+      </div>
+    </a>
+  </div>
+`;
+
+        latestGrid.insertAdjacentHTML("beforeend", cardWrapperHTML);
+      }
+
+      // Initialize toggle button for Latest Streams if more than 8 cards
+      const wrappers = Array.from(
+        latestGrid.querySelectorAll(".card-wrapper")
+      ) as HTMLElement[];
+      if (wrappers.length > 8) {
+        // Create toggle button
+        const button = document.createElement("button");
+        button.className =
+          "toggle-button flex mx-auto mt-6 items-center justify-center hover:opacity-80";
+        button.setAttribute("aria-expanded", "false");
+        button.title = "Mostrar más";
+
+        // Create SVG icon
+        const svg = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "svg"
+        );
+        svg.setAttribute("class", "arrow-icon");
+        svg.setAttribute("fill", "#ffffff");
+        svg.setAttribute("height", "64px");
+        svg.setAttribute("width", "64px");
+        svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        svg.setAttribute("viewBox", "0 0 512 512");
+        const path = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "path"
+        );
+        path.setAttribute(
+          "d",
+          "M256,0C114.837,0,0,114.837,0,256s114.837,256,256,256s256-114.837,256-256S397.163,0,256,0z M377.749,228.416 L271.083,335.083c-4.16,4.16-9.621,6.251-15.083,6.251c-5.462,0-10.923-2.091-15.083-6.251 L134.251,228.416c-8.341-8.341-8.341-21.824,0-30.165s21.824-8.341,30.165,0L256,289.835l91.584-91.584 c8.341-8.341,21.824-8.341,30.165,0C386.091,206.592,386.091,220.075,377.749,228.416z"
+        );
+        svg.appendChild(path);
+        button.appendChild(svg);
+
+        // Insert button after grid
+        if (latestGrid.parentNode) {
+          latestGrid.parentNode.insertBefore(button, latestGrid.nextSibling);
+        }
+
+        // Toggle logic
+        let expanded = false;
+        button.addEventListener("click", () => {
+          expanded = !expanded;
+          wrappers.forEach((w, i) => {
+            if (i >= 8) {
+              w.style.display = expanded ? "flex" : "none";
+            }
+          });
+          button.setAttribute("aria-expanded", String(expanded));
+          button.classList.toggle("expanded", expanded);
+          button.title = expanded ? "Mostrar menos" : "Mostrar más";
+        });
+
+        // Initial state: hide cards beyond 8
+        wrappers.forEach((w, i) => {
+          if (i >= 8) {
+            w.style.display = "none";
+          }
+        });
+        button.setAttribute("aria-expanded", "false");
+        button.title = "Mostrar más";
+      }
+    } catch (e) {
+      console.error("Error loading videos:", e);
+      const latestGrid = document
+        .querySelectorAll(".card-container")[0]
+        ?.querySelector(".grid");
+      if (latestGrid) {
+        latestGrid.innerHTML =
+          '<p class="col-span-full text-center">⚠ No se pudieron cargar los videos.</p>';
+      }
+    }
+  }
+
+  // Load videos when DOM is ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", cargarVideos);
+  } else {
+    cargarVideos();
+  }
+
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const timeline = gsap.timeline({
+    scrollTrigger: {
+      scrub: 1,
+    },
+  });
+
+  // Animation and navigation on ETK logo click
+  document.addEventListener("DOMContentLoaded", () => {
+    // Slide-in animations from bottom to top
+    gsap.set("#Sun", { y: "180%" });
+    gsap.to("#Sun", {
+      y: "0%",
+      duration: 1.5,
+      ease: "power2.out",
+    });
+
+    gsap.set("#Ground", { y: "120%" });
+    gsap.to("#Ground", {
+      y: "0%",
+      duration: 1.5,
+      ease: "power2.out",
+    });
+
+    gsap.set("#City", { y: "150%" });
+    gsap.to("#City", {
+      y: "0%",
+      duration: 1.5,
+      ease: "power2.out",
+    });
+
+    gsap.set("#Mountains", { y: "140%" });
+    gsap.to("#Mountains", {
+      y: "0%",
+      duration: 1.5,
+      ease: "power2.out",
+    });
+
+    // Slide-in animation for ETK logo from top to bottom
+    gsap.set("#etk-logo", { y: "-100%" });
+    gsap.to("#etk-logo", {
+      y: "0%",
+      duration: 1.5,
+      ease: "power2.out",
+    });
+
+    // Set initial state for stream
+    gsap.set("#player", { opacity: 0, scale: 0.2 });
+
+    const logo = document.getElementById("etk-logo");
+    if (logo) {
+      logo.addEventListener("click", () => {
+        // Animate stream to visible and full scale
+        gsap.to("#player", {
+          opacity: 1,
+          scale: 1.5,
+          duration: 2,
+          ease: "power2.out",
+        });
+        const logoTl = gsap.timeline();
+        logoTl.to(logo, {
+          duration: 1.5,
+          scale: 200,
+          opacity: 0,
+          ease: "power2.inOut",
+        }).to(logo, {
+          duration: 0.1,
+          scale: 0.5,
+          ease: "power2.inOut",
+        });
+      });
+    }
+  });
+</script>

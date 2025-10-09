@@ -1,0 +1,57 @@
+---
+const { title, content, thumbnail, link } = Astro.props;
+---
+<a href={link} target="_blank" class="block h-full">
+  <div class="card p-2 sm:p-4 h-full flex flex-col overflow-hidden rounded-lg bg-gray-900">
+    <!-- thumbnail -->
+    <div class="media w-full aspect-video rounded overflow-hidden bg-black flex-shrink-0">
+      <img
+        src={thumbnail}
+        alt={`Thumbnail for ${title}`}
+        class="block w-full h-full object-cover object-center"
+        loading="lazy"
+      />
+    </div>
+
+    <!-- contenido -->
+    <div class="flex-1 flex flex-col mt-2 min-h-0">
+      <h2 class="text-xl sm:text-2xl lg:text-3xl font-semibold line-clamp-2">
+        {title}
+      </h2>
+      <p class="text-sm sm:text-base line-clamp-1 mt-auto">
+        {content}
+      </p>
+    </div>
+  </div>
+</a>
+
+<style>
+  .card-wrapper,
+  .card {
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    max-width: none;
+  }
+
+  .card {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  .card:hover {
+    transform: scale(1.02);
+    opacity: 0.8;
+  }
+  @media (min-width: 768px) {
+    .card:hover {
+      transform: scale(1.05);
+      opacity: 0.7;
+    }
+  }
+</style>

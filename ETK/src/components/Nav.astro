@@ -1,0 +1,34 @@
+---
+// Nav.astro
+---
+
+<nav
+  class="fixed top-0 left-0 w-full flex items-center justify-between px-4 sm:px-8 py-3 sm:py-4 z-50 font-exo text-white nav-gradient"
+>
+  <!-- Secciones izquierda -->
+  <div class="flex space-x-2 sm:space-x-6">
+    <a href="/radio" class="text-sm sm:text-base hover:underline">Radio</a>
+  </div>
+
+  <!-- Secciones derecha -->
+  <div class="flex space-x-2 sm:space-x-6">
+    <a href="#patreon" class="text-sm sm:text-base hover:underline">Patreon</a>
+    <a href="#about" class="text-sm sm:text-base hover:underline">About Us</a>
+  </div>
+</nav>
+
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Exo:wght@400;600;700&display=swap");
+
+  .font-exo {
+    font-family: "Exo", sans-serif;
+  }
+
+  .nav-gradient {
+    background: linear-gradient(
+      to bottom,
+      rgba(10, 9, 8, 0.95),
+      rgba(10, 9, 8, 0)
+    );
+  }
+</style>

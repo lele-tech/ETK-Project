@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ETK Streaming</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      #video {
+        transition: opacity 0.45s ease;
+        opacity: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      #player { width: 42%; }
+    </style>
+  </head>
+  <body class="flex justify-center items-center h-screen m-0 bg-black">
+    <div id="player" class="relative aspect-video rounded-xl bg-black">
+      <video id="video" playsinline muted class="rounded-xl"></video>
+      <div id="dvd-wrapper" class="absolute top-0 left-0 w-full h-full pointer-events-none hidden">
+        <div id="dvd" class="absolute left-0 top-0 w-[9vw] h-[5vw] bg-orange-500" style="mask: url('public/img/ETK_Logo.svg'); -webkit-mask: url('public/img/ETK_Logo.svg'); mask-size:108% 108%; -webkit-mask-size:108% 108%;"></div>
+      </div>
+    </div>
+
+    <script>
+      console.log = console.warn = console.info = console.error = console.debug = console.trace = () => {};
+
+      const video = document.getElementById("video");
+      const wrapper = document.getElementById("dvd-wrapper");
+      const dvd = document.getElementById("dvd");
+
+      const owncastStream = "/owncast/hls/stream.m3u8";
+      const offlineVideo = "";
+      const errorVideo = "/videos/Tech__Diff_1080.webm";
+      const owncastStatusUrl = "/owncast/api/status";
+
+      let hls = null;
+      let lastState = null;
+      let consecutiveErrors = 0;
+      let animFrameId = null;
+      let isAnimating = false;
+      let prevColorChoiceIndex = 0;
+      const baseSpeedFraction = 0.0015;
+      const pallete = ["#ff8800", "#e124ff", "#6a19ff", "#ff2188"];
+      dvd.style.backgroundColor = pallete[0];
+
+      function setVideo(src, loop = false, controls = true, pip = true) {
+        if (src && (!video.src || !video.src.includes(src))) {
+          video.src = src;
+        }
+        video.loop = loop;
+        video.controls = controls;
+        video.disablePictureInPicture = !pip;
+        video.muted = true;
+        video.play().catch(() => {});
+      }
+
+      function fadeInVideo() {
+        video.style.opacity = 1;
+      }
+
+      function fadeOutVideo() {
+        video.style.opacity = 0;
+      }
+
+      function initHLS(source) {
+        if (hls && lastState === "online") return;
+        if (hls) {
+          try { hls.destroy(); } catch (e) {}
+          hls = null;
+        }
+        if (window.Hls && Hls.isSupported()) {
+          hls = new Hls({ startPosition: -1 });
+          hls.attachMedia(video);
+          hls.loadSource(source);
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            video.controls = true;
+            video.disablePictureInPicture = false;
+          });
+          const onCanPlay = () => {
+            fadeInVideo();
+            video.play().catch(()=>{});
+            video.removeEventListener("canplay", onCanPlay);
+          };
+          video.addEventListener("canplay", onCanPlay);
+          hls.on(Hls.Events.ERROR, (event, data) => {
+            if (data && data.fatal) {
+              try { hls.destroy(); } catch (e) {}
+              hls = null;
+              fadeOutVideo();
+              startDVD();
+              setVideo(offlineVideo, true, true, false);
+            }
+          });
+        } else if (video && video.canPlayType && video.canPlayType("application/vnd.apple.mpegurl")) {
+          setVideo(source, false, true, true);
+          const onCanPlayNative = () => { fadeInVideo(); video.removeEventListener("canplay", onCanPlayNative); };
+          video.addEventListener("canplay", onCanPlayNative);
+        } else {
+          startDVD();
+          setVideo(offlineVideo, true, true, false);
+        }
+      }
+
+      function getNewRandomColor() {
+        const currentPallete = [...pallete];
+        currentPallete.splice(prevColorChoiceIndex, 1);
+        const colorChoiceIndex = Math.floor(Math.random() * currentPallete.length);
+        prevColorChoiceIndex = (prevColorChoiceIndex + 1) % pallete.length;
+        return currentPallete[colorChoiceIndex];
+      }
+
+      let x = 0, y = 0, dirX = 1, dirY = 1;
+
+      function animate() {
+        const screenHeight = wrapper.clientHeight;
+        const screenWidth = wrapper.clientWidth;
+        const dvdWidth = dvd.offsetWidth || 100;
+        const dvdHeight = dvd.offsetHeight || 50;
+        const speed = baseSpeedFraction * Math.max(screenWidth, screenHeight);
+
+        if (y + dvdHeight >= screenHeight) { y = screenHeight - dvdHeight; dirY = -dirY; dvd.style.backgroundColor = getNewRandomColor(); }
+        else if (y <= 0) { y = 0; dirY = -dirY; dvd.style.backgroundColor = getNewRandomColor(); }
+
+        if (x + dvdWidth >= screenWidth) { x = screenWidth - dvdWidth; dirX = -dirX; dvd.style.backgroundColor = getNewRandomColor(); }
+        else if (x <= 0) { x = 0; dirX = -dirX; dvd.style.backgroundColor = getNewRandomColor(); }
+
+        x += dirX * speed;
+        y += dirY * speed;
+        dvd.style.left = x + "px";
+        dvd.style.top = y + "px";
+
+        animFrameId = window.requestAnimationFrame(animate);
+      }
+
+      function startDVD() {
+        if (isAnimating) return;
+        isAnimating = true;
+        wrapper.classList.remove("hidden");
+        fadeOutVideo();
+        const dvdW = dvd.offsetWidth || 100;
+        const dvdH = dvd.offsetHeight || 50;
+        const cw = wrapper.clientWidth || 1;
+        const ch = wrapper.clientHeight || 1;
+        if (x + dvdW > cw || y + dvdH > ch) { x = Math.max(0, Math.min(x, cw - dvdW)); y = Math.max(0, Math.min(y, ch - dvdH)); }
+        if (x === 0 && y === 0) { x = Math.max(2, Math.floor((cw - dvdW) / 2)); y = Math.max(2, Math.floor((ch - dvdH) / 2)); }
+        animFrameId = window.requestAnimationFrame(animate);
+      }
+
+      function stopDVD() {
+        if (!isAnimating) return;
+        isAnimating = false;
+        if (animFrameId) cancelAnimationFrame(animFrameId);
+        animFrameId = null;
+        wrapper.classList.add("hidden");
+      }
+
+      async function checkStream() {
+        try {
+          const res = await fetch(owncastStatusUrl, { cache: "no-store" });
+          const data = await res.json();
+          consecutiveErrors = 0;
+
+          if (data && data.online) {
+            if (lastState !== "online") {
+              lastState = "online";
+              stopDVD();
+              fadeOutVideo();
+              initHLS(owncastStream);
+            }
+          } else {
+            if (lastState !== "offline") {
+              lastState = "offline";
+              startDVD();
+              if (hls) { try { hls.destroy(); } catch (e) {} hls = null; }
+              setVideo(offlineVideo, true, true, false);
+            }
+          }
+        } catch (err) {
+          consecutiveErrors++;
+          if (consecutiveErrors >= 2 && lastState !== "error") {
+            lastState = "error";
+            stopDVD();
+            if (hls) { try { hls.destroy(); } catch (e) {} hls = null; }
+            setVideo(errorVideo, true, true, false);
+            fadeOutVideo();
+            startDVD();
+          }
+        }
+      }
+
+      startDVD();
+      checkStream();
+      const intervalId = setInterval(checkStream, 10000);
+
+      window.__startDVD = startDVD;
+      window.__stopDVD = stopDVD;
+
+      window.addEventListener("beforeunload", () => {
+        clearInterval(intervalId);
+        if (hls) { try { hls.destroy(); } catch (e) {} hls = null; }
+      });
+    </script>
+  </body>
+</html>
