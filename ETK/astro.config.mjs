@@ -10,7 +10,7 @@ export default defineConfig({
     server: {
       proxy: {
         '/owncast': {
-          target: 'http://192.168.50.228:8080',
+          target: 'http://192.168.100.47:8080',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/owncast/, ''),
         },

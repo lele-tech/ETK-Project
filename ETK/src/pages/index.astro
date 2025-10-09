@@ -46,6 +46,7 @@ import Sun from "../images/Assets_1080_Sun.png";
       />
 
       <div
+        id="logo-container"
         class="relative z-10 flex justify-center items-center w-screen h-screen scale-50"
       >
         <img
@@ -79,6 +80,15 @@ import Sun from "../images/Assets_1080_Sun.png";
 
   .toggle-button.expanded .arrow-icon {
     transform: rotate(180deg);
+  }
+
+  #logo-container {
+    transform: scale(0.5);
+  }
+
+  #logo-container:hover {
+    transform: scale(0.55);
+    transition: transform 0.3s ease;
   }
 </style>
 
@@ -285,16 +295,18 @@ import Sun from "../images/Assets_1080_Sun.png";
           ease: "power2.out",
         });
         const logoTl = gsap.timeline();
-        logoTl.to(logo, {
-          duration: 1.5,
-          scale: 200,
-          opacity: 0,
-          ease: "power2.inOut",
-        }).to(logo, {
-          duration: 0.1,
-          scale: 0.5,
-          ease: "power2.inOut",
-        });
+        logoTl
+          .to(logo, {
+            duration: 1.5,
+            scale: 200,
+            opacity: 0,
+            ease: "power2.inOut",
+          })
+          .to(logo, {
+            duration: 0.1,
+            scale: 0.5,
+            ease: "power2.inOut",
+          });
       });
     }
   });
