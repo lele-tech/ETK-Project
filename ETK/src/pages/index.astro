@@ -14,7 +14,9 @@ import Sun from "../images/Assets_1080_Sun.png";
 <Layout title="ETK Music">
   <main class="relative w-screen h-screen">
     <Nav />
-    <div class="flex absolute inset-0 z-5 justify-center items-center p-24">
+    <div
+      class="absolute top-[5%] w-full left-0 sm:left-[15%]  sm:w-[70%] h-[90%] z-5 flex justify-center items-center"
+    >
       <Stream />
     </div>
 
@@ -294,7 +296,7 @@ import Sun from "../images/Assets_1080_Sun.png";
         // Animate stream to visible and full scale
         gsap.to("#player", {
           opacity: 1,
-          scale: 1.5,
+          scale: 1,
           visibility: "visible",
           duration: 2,
           ease: "power2.out",

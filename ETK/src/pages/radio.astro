@@ -23,9 +23,9 @@ import Stream from "../components/Stream.astro";
 </style>
 
 <script>
-  const serverUrl = "http://209.148.103.84:8080";
+  const serverUrl = "http://192.168.100.14:8080";
 
   // Define fetches for status and config to be used in Stream component's loadData
-  const statusRes = fetch(`${serverUrl}/status`);
-  const configRes = fetch(`${serverUrl}/config`);
+  const statusRes = fetch(`${serverUrl}/api/status`);
+  const configRes = fetch(`${serverUrl}/api/config`);
 </script>

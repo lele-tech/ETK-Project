@@ -15,11 +15,11 @@
         height: 100%;
         object-fit: cover;
       }
-      #player { width: 42%; opacity: 0; }
+      #player { width: 100%; opacity: 0; }
     </style>
   </head>
   <body class="flex justify-center items-center h-screen m-0 bg-black">
-    <div id="player" class="relative aspect-video rounded-xl bg-black">
+    <div id="player" class="relative aspect-video sm:rounded-xl bg-black">
       <video id="video" playsinline muted class="rounded-xl"></video>
       <div id="dvd-wrapper" class="absolute top-0 left-0 w-full h-full pointer-events-none hidden">
         <div id="dvd" class="absolute left-0 top-0 w-[9vw] h-[5vw] bg-orange-500" style="mask: url('/img/ETK_Logo.svg'); -webkit-mask: url('/img/ETK_Logo.svg'); mask-size:108% 108%; -webkit-mask-size:108% 108%;"></div>
@@ -32,7 +32,7 @@
       const video = document.getElementById("video");
       const wrapper = document.getElementById("dvd-wrapper");
       const dvd = document.getElementById("dvd");
-      const serverUrl = "http://209.148.103.84:8080";
+      const serverUrl = "http://192.168.100.14:8080";
 
 
       const owncastStream = serverUrl+"/hls/stream.m3u8";
