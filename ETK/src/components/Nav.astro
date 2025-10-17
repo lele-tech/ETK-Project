@@ -7,15 +7,77 @@
 >
   <!-- Secciones izquierda -->
   <div class="flex space-x-2 sm:space-x-6">
-    <a href="/radio" class="text-sm sm:text-base hover:underline">Radio</a>
+    
   </div>
 
-  <!-- Secciones derecha -->
-  <div class="flex space-x-2 sm:space-x-6">
-    <a href="#patreon" class="text-sm sm:text-base hover:underline">Patreon</a>
-    <a href="#about" class="text-sm sm:text-base hover:underline">About Us</a>
+  <!-- Hamburger menu button for mobile -->
+  <button
+    id="menu-toggle"
+    class="sm:hidden flex flex-col space-y-1 p-2 transition-all duration-300"
+    aria-label="Toggle menu"
+  >
+    <span class="line block w-6 h-0.5 bg-white transition-all duration-300"
+    ></span>
+    <span class="line block w-6 h-0.5 bg-white transition-all duration-300"
+    ></span>
+    <span class="line block w-6 h-0.5 bg-white transition-all duration-300"
+    ></span>
+  </button>
+
+  <!-- Secciones derecha (desktop) -->
+  <div class="hidden sm:flex space-x-2 sm:space-x-6">
+    <a
+      href="https://www.patreon.com/etkmusicdotdance"
+      class="text-sm sm:text-base hover:underline hover:text-gray-300 transition-colors duration-200"
+      >Patreon</a
+    >
+    
+  </div>
+
+  <!-- Mobile menu -->
+  <div
+    id="mobile-menu"
+    class="sm:hidden absolute top-full left-0 w-full nav-gradient-deployed flex flex-col space-y-4 px-4 py-4 hidden transform transition-transform duration-300 ease-in-out -translate-y-full opacity-0"
+  >
+    <a
+      href="https://www.patreon.com/etkmusicdotdance"
+      class="text-sm text-right hover:underline transition-colors duration-200"
+      >Patreon</a
+    >
   </div>
 </nav>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const menuToggle = document.getElementById("menu-toggle");
+    const mobileMenu = document.getElementById("mobile-menu");
+    const nav = document.querySelector("nav");
+
+    if (menuToggle && mobileMenu && nav) {
+      menuToggle.addEventListener("click", () => {
+        // --- Animación del botón hamburguesa ---
+        menuToggle.classList.toggle("open");
+
+        // --- Lógica de despliegue del menú ---
+        if (mobileMenu.classList.contains("hidden")) {
+          mobileMenu.classList.remove("hidden");
+          nav.classList.add("menu-open");
+          setTimeout(() => {
+            mobileMenu.classList.remove("-translate-y-full", "opacity-0");
+            mobileMenu.classList.add("translate-y-0", "opacity-100");
+          }, 10);
+        } else {
+          mobileMenu.classList.add("-translate-y-full", "opacity-0");
+          mobileMenu.classList.remove("translate-y-0", "opacity-100");
+          nav.classList.remove("menu-open");
+          setTimeout(() => {
+            mobileMenu.classList.add("hidden");
+          }, 300);
+        }
+      });
+    }
+  });
+</script>
 
 <style>
   @import url("https://fonts.googleapis.com/css2?family=Exo:wght@400;600;700&display=swap");
@@ -30,5 +92,40 @@
       rgba(10, 9, 8, 0.95),
       rgba(10, 9, 8, 0)
     );
+  }
+
+  /* 🔹 Gradiente del menú desplegado (de arriba a abajo) */
+  .nav-gradient-deployed {
+    background: linear-gradient(
+      to bottom,
+      rgba(10, 9, 8, 0.95) 0%,
+      rgba(10, 9, 8, 0.85) 30%,
+      rgba(10, 9, 8, 0.7) 60%,
+      rgba(10, 9, 8, 0.4) 90%,
+      rgba(10, 9, 8, 0) 100%
+    );
+  }
+
+  .nav-gradient.menu-open {
+    background: linear-gradient(
+      to bottom,
+      rgba(10, 9, 8, 0.95) 0%,
+      rgba(10, 9, 8, 0.95) 100%
+    );
+  }
+
+  /* Animación para convertir el menú hamburguesa en una X */
+  #menu-toggle.open .line:nth-child(1) {
+    transform: rotate(45deg) translate(4px, 4px);
+  }
+  #menu-toggle.open .line:nth-child(2) {
+    opacity: 0;
+  }
+  #menu-toggle.open .line:nth-child(3) {
+    transform: rotate(-45deg) translate(4px, -4px);
+  }
+
+  #menu-toggle .line {
+    transform-origin: center;
   }
 </style>

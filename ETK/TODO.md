@@ -1,1 +1,2 @@
-- [ ] Add hover scale effect to .card-wrapper in src/pages/index.astro
+- [x] Update mobile-menu div classes to slide from right instead of top
+- [x] Update JavaScript toggle logic to use translate-x instead of translate-y
